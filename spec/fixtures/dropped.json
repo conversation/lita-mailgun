@@ -1,0 +1,25 @@
+{
+  "Message-Id": "<20130503192659.13651.20287@theconversation.com>",
+  "X-Mailgun-Sid": "WyIwNzI5MCIsICJpZG91YnR0aGlzb25lZXhpc3RzQGdtYWlsLmNvbSIsICI2Il0=",
+  "attachment-count": "1",
+  "body-plain": "",
+  "code": "605",
+  "description": "Not delivering to previously bounced address",
+  "domain": "theconversation.com",
+  "event": "dropped",
+  "message-headers": "[[\"Received\", \"by luna.mailgun.net with SMTP mgrt 8755546751405; Fri, 03 May 2013 19:26:59 +0000\"], [\"Content-Type\", [\"multipart/alternative\", {\"boundary\": \"23041bcdfae54aafb801a8da0283af85\"}]], [\"Mime-Version\", \"1.0\"], [\"Subject\", \"Test drop webhook\"], [\"From\", \"Bob <bob@theconversation.com>\"], [\"To\", \"Alice <alice@example.com>\"], [\"Message-Id\", \"<20130503192659.13651.20287@theconversation.com>\"], [\"List-Unsubscribe\", \"<mailto:u+na6tmy3ege4tgnldmyytqojqmfsdembyme3tmy3cha4wcndbgaydqyrgoi6wszdpovrhi5dinfzw63tfmv4gs43uomstimdhnvqws3bomnxw2jtuhusteqjgmq6tm@theconversation.com>\"], [\"X-Mailgun-Sid\", \"WyIwNzI5MCIsICJpZG91YnR0aGlzb25lZXhpc3RzQGdtYWlsLmNvbSIsICI2Il0=\"], [\"X-Mailgun-Variables\", \"{\\\"my_var_1\\\": \\\"Mailgun Variable #1\\\", \\\"my-var-2\\\": \\\"awesome\\\"}\"], [\"Date\", \"Fri, 03 May 2013 19:26:59 +0000\"], [\"Sender\", \"bob@theconversation.com\"]]",
+  "my-var-2": "awesome",
+  "my_var_1": "Mailgun Variable #1",
+  "reason": "hardfail",
+  "recipient": "alice@example.com",
+  "signature": "dfd54a0b5442c59dbdea7c2b1af05151f1a9032d9274da61509ec35d14e05093",
+  "timestamp": "1465741615",
+  "token": "e1fe176199bfd5b99221d7d53a8ce918a9b32a367fc5e89dc4",
+  "attachment-1": {
+    "filename": "message.mime",
+    "type": "application/octet-stream",
+    "name": "attachment-1",
+    "tempfile": "#<File:0x007f0851f46bd0>",
+    "head": "Content-Disposition: form-data; name=\"attachment-1\"; filename=\"message.mime\"\r\nContent-Type: application/octet-stream\r\nContent-Length: 1258\r\n"
+  }
+}

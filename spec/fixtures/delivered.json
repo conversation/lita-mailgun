@@ -1,0 +1,13 @@
+{
+  "domain": "theconversation.com",
+  "my_var_1": "Mailgun Variable #1",
+  "my-var-2": "awesome",
+  "message-headers": "[[\"Received\", \"by luna.mailgun.net with SMTP mgrt 8734663311733; Fri, 03 May 2013 18:26:27 +0000\"], [\"Content-Type\", [\"multipart/alternative\", {\"boundary\": \"eb663d73ae0a4d6c9153cc0aec8b7520\"}]], [\"Mime-Version\", \"1.0\"], [\"Subject\", \"Test deliver webhook\"], [\"From\", \"Bob <bob@theconversation.com>\"], [\"To\", \"Alice <alice@example.com>\"], [\"Message-Id\", \"<20130503182626.18666.16540@theconversation.com>\"], [\"X-Mailgun-Variables\", \"{\\\"my_var_1\\\": \\\"Mailgun Variable #1\\\", \\\"my-var-2\\\": \\\"awesome\\\"}\"], [\"Date\", \"Fri, 03 May 2013 18:26:27 +0000\"], [\"Sender\", \"bob@theconversation.com\"]]",
+  "Message-Id": "<20130503182626.18666.16540@theconversation.com>",
+  "recipient": "alice@example.com",
+  "event": "delivered",
+  "timestamp": "1465741724",
+  "token": "158ce043abea7304a212b02e0cb5ed2e854bbc980ff471fa6f",
+  "signature": "e61b2e2becbdc65596ae76b56477a6244d015812d62c18f282fc7f63e0dd4d2f",
+  "body-plain": ""
+}
