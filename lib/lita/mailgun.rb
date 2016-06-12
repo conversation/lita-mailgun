@@ -10,8 +10,7 @@ module Lita
       http.post "/mailgun", :mailgun_event
 
       def mailgun_event(request, response)
-        body = request.body.read
-        robot.send_message(target, body)
+        robot.send_message(target, "```" + JSON.dump(request.params) + "```")
       end
 
       private
