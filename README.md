@@ -15,6 +15,17 @@ get started, use the mailgun web interface to configure a webhook that POSTs eve
 
     http://your-lita-bot.com/mailgun
 
+### Dropped Email Reports
+
+To print a warning when a high number of recent emails to a domain were
+dropped, edit your lita\_config.rb to include the following line.
+
+    config.handlers.mailgun_droppped_rate.channel_name = "channel-name"
+
+The warnings will look something like this:
+
+    [mailgun] [bigpond.net.au] 8/10 (80.0%) recent emails dropped
+
 ## Chat commands
 
 This handler provides no additional chat commands. Yet.
@@ -23,4 +34,6 @@ This handler provides no additional chat commands. Yet.
 
 Possible ideas for new features, either via chat commands or externally triggered events:
 
-* more specs
+* only print the warnings when the dropped rate exceeds a threshold
+* maybe set a maximum period of time to store the event data?
+* use redis to store event data so it persists across server restarts
