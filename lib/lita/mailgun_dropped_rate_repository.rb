@@ -1,5 +1,6 @@
 require "ostruct"
 require "bigdecimal"
+require "thread"
 
 module Lita
   class MailgunDroppedRateRepository
@@ -19,21 +20,26 @@ module Lita
     
     def initialize
       @store = {}
+      @mutex = Mutex.new
     end
 
     def record(domain, event_name)
       return false unless valid_event?(event_name)
 
-      @store[domain] ||= []
-      @store[domain] << event_name
-      if @store[domain].size > 100
-        @store[domain] = @store[domain].silce(-100, 100)
+      @mutex.synchronize do
+        @store[domain] ||= []
+        @store[domain] << event_name
+        if @store[domain].size > 100
+          @store[domain] = @store[domain].silce(-100, 100)
+        end
       end
       true
     end
 
     def dropped_rate(domain)
-      DroppedResult.new( domain, dropped_count(domain), total_count(domain) )
+      @mutex.synchronize do
+        DroppedResult.new( domain, dropped_count(domain), total_count(domain) )
+      end
     end
 
     private
