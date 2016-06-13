@@ -10,13 +10,8 @@ module Lita
       http.post "/mailgun", :mailgun_event
 
       def mailgun_event(request, response)
-        robot.send_message(target, "```" + JSON.dump(request.params) + "```")
-      end
-
-      private
-
-      def target
-        Source.new(room: Lita::Room.find_by_name("tcbot-testing") || "general")
+        event = MailgunEvent.new(request.params)
+        robot.trigger(:mailgun_event, event: event)
       end
 
     end
