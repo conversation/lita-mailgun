@@ -3,7 +3,19 @@ module Lita
     attr_reader :data
 
     def initialize(data)
-      @data = JSON.load(data)
+      @data = data
+    end
+
+    def name
+      @data.fetch("event")
+    end
+
+    def recipient
+      @data.fetch("recipient")
+    end
+
+    def recipient_domain
+      recipient.split("@").last
     end
 
   end
