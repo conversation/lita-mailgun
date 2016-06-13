@@ -18,4 +18,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency("rdoc")
 
   spec.add_dependency("lita")
+  spec.add_dependency("lita-timing")
 end
