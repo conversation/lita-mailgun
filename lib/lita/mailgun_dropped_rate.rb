@@ -31,7 +31,7 @@ module Lita
       end
 
       def repository
-        @@repository ||= MailgunDroppedRateRepository.new
+        @repository ||= MailgunDroppedRateRepository.new(redis)
       end
 
       def target
