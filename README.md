@@ -34,5 +34,4 @@ This handler provides no additional chat commands. Yet.
 
 Possible ideas for new features, either via chat commands or externally triggered events:
 
-* only print the warnings when the dropped rate exceeds a threshold
 * maybe set a maximum period of time to store the event data?
