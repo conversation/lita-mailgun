@@ -30,7 +30,7 @@ module Lita
         @store[domain] ||= []
         @store[domain] << event_name
         if @store[domain].size > 100
-          @store[domain] = @store[domain].silce(-100, 100)
+          @store[domain] = @store[domain].slice(-100, 100)
         end
       end
       true
