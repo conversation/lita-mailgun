@@ -29,8 +29,8 @@ module Lita
       @mutex.synchronize do
         @store[domain] ||= []
         @store[domain] << event_name
-        if @store[domain].size > 100
-          @store[domain] = @store[domain].slice(-100, 100)
+        if @store[domain].size > 20
+          @store[domain] = @store[domain].slice(-20, 20)
         end
       end
       true

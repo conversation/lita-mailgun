@@ -31,9 +31,9 @@ describe Lita::MailgunDroppedRateRepository do
       end
     end
   end
-  context "when a single domain records 101 events" do
+  context "when a single domain records 21 events" do
     before do
-      101.times do
+      21.times do
         repository.record("example.com", :delivered)
       end
     end
@@ -49,7 +49,7 @@ describe Lita::MailgunDroppedRateRepository do
       end
 
       it "sets the total_count" do
-        expect(result.total).to eq(100)
+        expect(result.total).to eq(20)
       end
 
       it "includes the dropped rate" do
