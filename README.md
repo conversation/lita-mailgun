@@ -36,4 +36,3 @@ Possible ideas for new features, either via chat commands or externally triggere
 
 * only print the warnings when the dropped rate exceeds a threshold
 * maybe set a maximum period of time to store the event data?
-* use redis to store event data so it persists across server restarts

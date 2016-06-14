@@ -1,6 +1,5 @@
 require "ostruct"
 require "bigdecimal"
-require "thread"
 
 module Lita
   class MailgunDroppedRateRepository
@@ -17,45 +16,40 @@ module Lita
         (BigDecimal.new(dropped) / BigDecimal.new(total) * 100).round(3)
       end
     end
-    
-    def initialize
-      @store = {}
-      @mutex = Mutex.new
+
+    def initialize(redis)
+      @redis = redis
     end
 
     def record(domain, event_name)
       return false unless valid_event?(event_name)
 
-      @mutex.synchronize do
-        @store[domain] ||= []
-        @store[domain] << event_name
-        if @store[domain].size > 20
-          @store[domain] = @store[domain].slice(-20, 20)
-        end
-      end
+      key = "events-#{domain}"
+      @redis.rpush(key, event_name.to_s)
+      @redis.ltrim(key, -20, -1)
       true
     end
 
     def dropped_rate(domain)
-      @mutex.synchronize do
-        DroppedResult.new( domain, dropped_count(domain), total_count(domain) )
-      end
+      DroppedResult.new( domain, dropped_count(domain), total_count(domain) )
     end
 
     private
 
     def dropped_count(domain)
-      return 0 if @store[domain].nil?
-
-      @store[domain].select { |item|
-        item == :dropped
+      fetch_events(domain).select { |item|
+        item == "dropped".freeze
       }.size
     end
 
     def total_count(domain)
-      return 0 if @store[domain].nil?
+      fetch_events(domain).size
+    end
 
-      @store[domain].size
+    def fetch_events(domain)
+      key = "events-#{domain}"
+
+      list = @redis.lrange(key, 0, 19)
     end
 
     def valid_event?(event_name)
