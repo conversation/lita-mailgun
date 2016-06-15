@@ -35,3 +35,6 @@ This handler provides no additional chat commands. Yet.
 Possible ideas for new features, either via chat commands or externally triggered events:
 
 * maybe set a maximum period of time to store the event data?
+* maybe record the number of unique addresses that have failed, and skip warning
+  if all failures are to 1 or 2 addresses. We're looking for issues that are likely
+  domain wide, not a single mailbox
