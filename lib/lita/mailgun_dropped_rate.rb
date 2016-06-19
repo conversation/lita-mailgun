@@ -17,7 +17,7 @@ module Lita
       def monitor_event(payload)
         event = payload[:event]
 
-        repository.record(event.recipient_domain, event.name.to_sym)
+        repository.record(event.recipient, event.name.to_sym)
 
         result = repository.dropped_rate(event.recipient_domain)
         if result.dropped_rate > REPORTING_THRESHOLD
@@ -30,7 +30,7 @@ module Lita
       private
 
       def result_to_message(result)
-        "[mailgun] [#{result.domain}] #{result.dropped}/#{result.total} (#{result.dropped_rate.to_s("F")}%) recent emails dropped"
+        "[mailgun] [#{result.domain}] recent emails dropped: #{result.dropped}/#{result.total} (#{result.dropped_rate.to_s("F")}%) uniq addresses: #{result.uniq_dropped}"
       end
 
       def repository

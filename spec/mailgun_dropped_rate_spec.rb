@@ -6,7 +6,7 @@ describe Lita::Handlers::MailgunDroppedRate, lita_handler: true do
   describe "#monitor_event" do
     let(:payload) { {event: event} }
     let(:repository) { instance_double(Lita::MailgunDroppedRateRepository, record: true) }
-    let(:result) { Lita::MailgunDroppedRateRepository::DroppedResult.new("example.com", 3, 4) }
+    let(:result) { Lita::MailgunDroppedRateRepository::DroppedResult.new("example.com", 3, 1, 4) }
 
     before do
       allow(robot).to receive(:send_message)
@@ -19,7 +19,7 @@ describe Lita::Handlers::MailgunDroppedRate, lita_handler: true do
 
       it "records the event and sends a message" do
         handler.monitor_event(event: event)
-        expect(repository).to have_received(:record).with("example.com", :delivered)
+        expect(repository).to have_received(:record).with("james@example.com", :delivered)
         expect(robot).to have_received(:send_message).once
       end
     end
@@ -30,7 +30,7 @@ describe Lita::Handlers::MailgunDroppedRate, lita_handler: true do
       it "records the event and sends a single message" do
         handler.monitor_event(event: event)
         handler.monitor_event(event: event)
-        expect(repository).to have_received(:record).with("example.com", :delivered).twice
+        expect(repository).to have_received(:record).with("james@example.com", :delivered).twice
         expect(robot).to have_received(:send_message).once
       end
     end

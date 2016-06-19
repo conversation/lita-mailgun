@@ -1,16 +1,18 @@
 require "ostruct"
 require "bigdecimal"
+require 'json'
 
 module Lita
   class MailgunDroppedRateRepository
     VALID_EVENTS = [:delivered, :dropped]
-    TWO_WEEKS = 60 * 60 * 24 * 7 * 2
+    ONE_WEEK = 60 * 60 * 24 * 7
+    TWO_WEEKS = ONE_WEEK * 2
 
     class DroppedResult
-      attr_reader :domain, :dropped, :total
+      attr_reader :domain, :dropped, :uniq_dropped, :total
 
-      def initialize(domain, dropped, total)
-        @domain, @dropped, @total = domain, dropped.to_i, total.to_i
+      def initialize(domain, dropped, uniq_dropped, total)
+        @domain, @dropped, @uniq_dropped, @total = domain, dropped.to_i, uniq_dropped.to_i, total.to_i
       end
 
       def dropped_rate
@@ -22,36 +24,55 @@ module Lita
       @redis = redis
     end
 
-    def record(domain, event_name)
+    def record(recipient, event_name)
       return false unless valid_event?(event_name)
 
+      domain = extract_domain(recipient)
+
       key = "events-#{domain}"
-      @redis.rpush(key, event_name.to_s)
+      data = {event: event_name, domain: domain, recipient: recipient, at: Time.now.to_i}
+      @redis.rpush(key, JSON.dump(data))
       @redis.ltrim(key, -20, -1)
       @redis.expire(key, TWO_WEEKS)
       true
     end
 
     def dropped_rate(domain)
-      DroppedResult.new( domain, dropped_count(domain), total_count(domain) )
+      events = fetch_events(domain)
+
+      DroppedResult.new( domain, dropped_count(events), uniq_dropped_count(events), events.size )
     end
 
     private
 
-    def dropped_count(domain)
-      fetch_events(domain).select { |item|
-        item == "dropped".freeze
+    def extract_domain(email)
+      email.to_s.split("@").last || "unknown"
+    end
+
+    def dropped_count(events)
+      events.select { |item|
+        item["event".freeze] == "dropped".freeze
       }.size
     end
 
-    def total_count(domain)
-      fetch_events(domain).size
+    def uniq_dropped_count(events)
+      events.select { |item|
+        item["event".freeze] == "dropped".freeze
+      }.map { |item|
+        item["recipient".freeze]
+      }.uniq.size
     end
 
     def fetch_events(domain)
       key = "events-#{domain}"
+      one_week_ago = Time.now.to_i - ONE_WEEK
 
-      list = @redis.lrange(key, 0, 19)
+      events = @redis.lrange(key, 0, 19) || []
+      events.map { |data|
+        JSON.load(data)
+      }.select { |data|
+        data["at".freeze].to_i > one_week_ago
+      }
     end
 
     def valid_event?(event_name)
