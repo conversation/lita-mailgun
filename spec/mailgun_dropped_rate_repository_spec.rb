@@ -104,6 +104,10 @@ describe Lita::MailgunDroppedRateRepository do
         expect(result.dropped).to eq(1)
       end
 
+      it "sets the uniq dropped_count" do
+        expect(result.uniq_dropped).to eq(1)
+      end
+
       it "sets the total_count" do
         expect(result.total).to eq(4)
       end
@@ -126,6 +130,10 @@ describe Lita::MailgunDroppedRateRepository do
 
       it "sets the dropped count" do
         expect(result.dropped).to eq(0)
+      end
+
+      it "sets the uniq dropped_count" do
+        expect(result.uniq_dropped).to eq(0)
       end
 
       it "sets the total_count" do
@@ -153,6 +161,10 @@ describe Lita::MailgunDroppedRateRepository do
 
       it "sets the dropped count" do
         expect(result.dropped).to eq(1)
+      end
+
+      it "sets the uniq dropped_count" do
+        expect(result.uniq_dropped).to eq(1)
       end
 
       it "sets the total_count" do

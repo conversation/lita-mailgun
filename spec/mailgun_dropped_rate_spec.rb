@@ -6,7 +6,7 @@ describe Lita::Handlers::MailgunDroppedRate, lita_handler: true do
   describe "#monitor_event" do
     let(:payload) { {event: event} }
     let(:repository) { instance_double(Lita::MailgunDroppedRateRepository, record: true) }
-    let(:result) { Lita::MailgunDroppedRateRepository::DroppedResult.new("example.com", 3, 4) }
+    let(:result) { Lita::MailgunDroppedRateRepository::DroppedResult.new("example.com", 3, 1, 4) }
 
     before do
       allow(robot).to receive(:send_message)

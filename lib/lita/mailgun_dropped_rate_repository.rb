@@ -9,10 +9,10 @@ module Lita
     TWO_WEEKS = ONE_WEEK * 2
 
     class DroppedResult
-      attr_reader :domain, :dropped, :total
+      attr_reader :domain, :dropped, :uniq_dropped, :total
 
-      def initialize(domain, dropped, total)
-        @domain, @dropped, @total = domain, dropped.to_i, total.to_i
+      def initialize(domain, dropped, uniq_dropped, total)
+        @domain, @dropped, @uniq_dropped, @total = domain, dropped.to_i, uniq_dropped.to_i, total.to_i
       end
 
       def dropped_rate
@@ -40,7 +40,7 @@ module Lita
     def dropped_rate(domain)
       events = fetch_events(domain)
 
-      DroppedResult.new( domain, dropped_count(events), events.size )
+      DroppedResult.new( domain, dropped_count(events), uniq_dropped_count(events), events.size )
     end
 
     private
@@ -53,6 +53,14 @@ module Lita
       events.select { |item|
         item["event".freeze] == "dropped".freeze
       }.size
+    end
+
+    def uniq_dropped_count(events)
+      events.select { |item|
+        item["event".freeze] == "dropped".freeze
+      }.map { |item|
+        item["recipient".freeze]
+      }.uniq.size
     end
 
     def fetch_events(domain)
