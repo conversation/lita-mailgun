@@ -38,7 +38,7 @@ module Lita
     end
 
     def dropped_rate(domain)
-      events = fetch_events(domain) || []
+      events = fetch_events(domain)
 
       DroppedResult.new( domain, dropped_count(events), events.size )
     end
