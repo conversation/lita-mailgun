@@ -8,6 +8,7 @@ describe Lita::MailgunDroppedRateRepository do
     allow(redis).to receive(:rpush)
     allow(redis).to receive(:ltrim)
     allow(redis).to receive(:lrange)
+    allow(redis).to receive(:expire)
   end
 
   describe "#record" do
@@ -26,6 +27,11 @@ describe Lita::MailgunDroppedRateRepository do
       it "trims the list" do
         repository.record("example.com", :delivered)
         expect(redis).to have_received(:ltrim).with("events-example.com", -20, -1)
+      end
+
+      it "sets the list expiry" do
+        repository.record("example.com", :delivered)
+        expect(redis).to have_received(:expire).with("events-example.com", 1209600) # two weeks
       end
     end
 
@@ -55,6 +61,11 @@ describe Lita::MailgunDroppedRateRepository do
       it "does not trim the list" do
         repository.record("example.com", :foo)
         expect(redis).to_not have_received(:ltrim)
+      end
+
+      it "sets the list expiry" do
+        repository.record("example.com", :foo)
+        expect(redis).to_not have_received(:expire)
       end
     end
   end

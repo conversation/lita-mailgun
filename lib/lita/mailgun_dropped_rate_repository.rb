@@ -4,6 +4,7 @@ require "bigdecimal"
 module Lita
   class MailgunDroppedRateRepository
     VALID_EVENTS = [:delivered, :dropped]
+    TWO_WEEKS = 60 * 60 * 24 * 7 * 2
 
     class DroppedResult
       attr_reader :domain, :dropped, :total
@@ -27,6 +28,7 @@ module Lita
       key = "events-#{domain}"
       @redis.rpush(key, event_name.to_s)
       @redis.ltrim(key, -20, -1)
+      @redis.expire(key, TWO_WEEKS)
       true
     end
 
