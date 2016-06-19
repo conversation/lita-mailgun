@@ -89,10 +89,10 @@ describe Lita::MailgunDroppedRateRepository do
     context "when the requested domain has 4 events" do
       let(:stored_events) {
         [
-          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: "123"),
-          JSON.dump(event: "dropped", domain: "example.com", recipient: "user@example.com", at: "123"),
-          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: "123"),
-          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: "123"),
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
+          JSON.dump(event: "dropped", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
         ]
       }
 
@@ -116,7 +116,7 @@ describe Lita::MailgunDroppedRateRepository do
     context "when the requested domain has 20 events" do
       let(:stored_events) {
         [
-          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: "123"),
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
         ] * 20
       }
 
@@ -137,5 +137,31 @@ describe Lita::MailgunDroppedRateRepository do
       end
     end
 
+    context "when the requested domain has 2 recent events and 1 old event" do
+      let(:eight_days) { 60 * 60 * 24 * 8 }
+      let(:stored_events) {
+        [
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i - eight_days),
+          JSON.dump(event: "dropped", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
+        ]
+      }
+
+      it "sets the domain" do
+        expect(result.domain).to eq("example.com")
+      end
+
+      it "sets the dropped count" do
+        expect(result.dropped).to eq(1)
+      end
+
+      it "sets the total_count" do
+        expect(result.total).to eq(2)
+      end
+
+      it "includes the dropped rate" do
+        expect(result.dropped_rate).to eq(BigDecimal.new("50.0"))
+      end
+    end
   end
 end

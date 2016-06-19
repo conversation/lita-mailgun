@@ -5,7 +5,8 @@ require 'json'
 module Lita
   class MailgunDroppedRateRepository
     VALID_EVENTS = [:delivered, :dropped]
-    TWO_WEEKS = 60 * 60 * 24 * 7 * 2
+    ONE_WEEK = 60 * 60 * 24 * 7
+    TWO_WEEKS = ONE_WEEK * 2
 
     class DroppedResult
       attr_reader :domain, :dropped, :total
@@ -56,9 +57,13 @@ module Lita
 
     def fetch_events(domain)
       key = "events-#{domain}"
+      one_week_ago = Time.now.to_i - ONE_WEEK
 
-      @redis.lrange(key, 0, 19).map { |data|
+      events = @redis.lrange(key, 0, 19) || []
+      events.map { |data|
         JSON.load(data)
+      }.select { |data|
+        data["at".freeze].to_i > one_week_ago
       }
     end
 
