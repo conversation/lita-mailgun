@@ -30,7 +30,7 @@ module Lita
       private
 
       def result_to_message(result)
-        "[mailgun] [#{result.domain}] #{result.dropped}/#{result.total} (#{result.dropped_rate.to_s("F")}%) recent emails dropped"
+        "[mailgun] [#{result.domain}] recent emails dropped: #{result.dropped}/#{result.total} (#{result.dropped_rate.to_s("F")}%) uniq addresses: #{result.uniq_dropped}"
       end
 
       def repository
