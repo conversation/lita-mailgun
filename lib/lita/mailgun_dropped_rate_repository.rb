@@ -1,5 +1,6 @@
 require "ostruct"
 require "bigdecimal"
+require 'json'
 
 module Lita
   class MailgunDroppedRateRepository
@@ -22,36 +23,43 @@ module Lita
       @redis = redis
     end
 
-    def record(domain, event_name)
+    def record(recipient, event_name)
       return false unless valid_event?(event_name)
 
+      domain = extract_domain(recipient)
+
       key = "events-#{domain}"
-      @redis.rpush(key, event_name.to_s)
+      data = {event: event_name, domain: domain, recipient: recipient, at: Time.now.to_i}
+      @redis.rpush(key, JSON.dump(data))
       @redis.ltrim(key, -20, -1)
       @redis.expire(key, TWO_WEEKS)
       true
     end
 
     def dropped_rate(domain)
-      DroppedResult.new( domain, dropped_count(domain), total_count(domain) )
+      events = fetch_events(domain) || []
+
+      DroppedResult.new( domain, dropped_count(events), events.size )
     end
 
     private
 
-    def dropped_count(domain)
-      fetch_events(domain).select { |item|
-        item == "dropped".freeze
-      }.size
+    def extract_domain(email)
+      email.to_s.split("@").last || "unknown"
     end
 
-    def total_count(domain)
-      fetch_events(domain).size
+    def dropped_count(events)
+      events.select { |item|
+        item["event".freeze] == "dropped".freeze
+      }.size
     end
 
     def fetch_events(domain)
       key = "events-#{domain}"
 
-      list = @redis.lrange(key, 0, 19)
+      @redis.lrange(key, 0, 19).map { |data|
+        JSON.load(data)
+      }
     end
 
     def valid_event?(event_name)

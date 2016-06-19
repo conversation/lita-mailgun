@@ -12,25 +12,32 @@ describe Lita::MailgunDroppedRateRepository do
   end
 
   describe "#record" do
+    before do
+      allow(Time).to receive(:now) { Time.utc(2016, 6, 19, 13, 05, 59) }
+    end
+
     context "with event: delivered" do
       it "returns true" do
         expect(
-          repository.record("example.com", :delivered)
+          repository.record("user@example.com", :delivered)
         ).to eq true
       end
 
       it "stores the event in redis" do
-        repository.record("example.com", :delivered)
-        expect(redis).to have_received(:rpush).with("events-example.com", "delivered")
+        repository.record("user@example.com", :delivered)
+        expect(redis).to have_received(:rpush).with(
+          "events-example.com",
+          "{\"event\":\"delivered\",\"domain\":\"example.com\",\"recipient\":\"user@example.com\",\"at\":1466341559}"
+        )
       end
 
       it "trims the list" do
-        repository.record("example.com", :delivered)
+        repository.record("user@example.com", :delivered)
         expect(redis).to have_received(:ltrim).with("events-example.com", -20, -1)
       end
 
       it "sets the list expiry" do
-        repository.record("example.com", :delivered)
+        repository.record("user@example.com", :delivered)
         expect(redis).to have_received(:expire).with("events-example.com", 1209600) # two weeks
       end
     end
@@ -38,33 +45,36 @@ describe Lita::MailgunDroppedRateRepository do
     context "with event: dropped" do
       it "returns true" do
         expect(
-          repository.record("example.com", :dropped)
+          repository.record("user@example.com", :dropped)
         ).to eq true
       end
 
       it "stores the event in redis" do
-        repository.record("example.com", :dropped)
-        expect(redis).to have_received(:rpush).with("events-example.com", "dropped")
+        repository.record("user@example.com", :dropped)
+        expect(redis).to have_received(:rpush).with(
+          "events-example.com",
+          "{\"event\":\"dropped\",\"domain\":\"example.com\",\"recipient\":\"user@example.com\",\"at\":1466341559}"
+        )
       end
     end
     context "with event: foo" do
       it "returns false" do
         expect(
-          repository.record("example.com", :foo)
+          repository.record("user@example.com", :foo)
         ).to eq false
       end
       it "does not store the event in redis" do
-        repository.record("example.com", :foo)
+        repository.record("user@example.com", :foo)
         expect(redis).to_not have_received(:rpush)
       end
 
       it "does not trim the list" do
-        repository.record("example.com", :foo)
+        repository.record("user@example.com", :foo)
         expect(redis).to_not have_received(:ltrim)
       end
 
       it "sets the list expiry" do
-        repository.record("example.com", :foo)
+        repository.record("user@example.com", :foo)
         expect(redis).to_not have_received(:expire)
       end
     end
@@ -77,7 +87,14 @@ describe Lita::MailgunDroppedRateRepository do
     end
 
     context "when the requested domain has 4 events" do
-      let(:stored_events) { ["delivered", "dropped", "delivered", "delivered"] }
+      let(:stored_events) {
+        [
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: "123"),
+          JSON.dump(event: "dropped", domain: "example.com", recipient: "user@example.com", at: "123"),
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: "123"),
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: "123"),
+        ]
+      }
 
       it "sets the domain" do
         expect(result.domain).to eq("example.com")
@@ -97,7 +114,11 @@ describe Lita::MailgunDroppedRateRepository do
     end
 
     context "when the requested domain has 20 events" do
-      let(:stored_events) { ["delivered"] * 20 }
+      let(:stored_events) {
+        [
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: "123"),
+        ] * 20
+      }
 
       it "sets the domain" do
         expect(result.domain).to eq("example.com")

@@ -19,7 +19,7 @@ describe Lita::Handlers::MailgunDroppedRate, lita_handler: true do
 
       it "records the event and sends a message" do
         handler.monitor_event(event: event)
-        expect(repository).to have_received(:record).with("example.com", :delivered)
+        expect(repository).to have_received(:record).with("james@example.com", :delivered)
         expect(robot).to have_received(:send_message).once
       end
     end
@@ -30,7 +30,7 @@ describe Lita::Handlers::MailgunDroppedRate, lita_handler: true do
       it "records the event and sends a single message" do
         handler.monitor_event(event: event)
         handler.monitor_event(event: event)
-        expect(repository).to have_received(:record).with("example.com", :delivered).twice
+        expect(repository).to have_received(:record).with("james@example.com", :delivered).twice
         expect(robot).to have_received(:send_message).once
       end
     end

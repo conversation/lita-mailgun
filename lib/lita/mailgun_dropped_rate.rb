@@ -17,7 +17,7 @@ module Lita
       def monitor_event(payload)
         event = payload[:event]
 
-        repository.record(event.recipient_domain, event.name.to_sym)
+        repository.record(event.recipient, event.name.to_sym)
 
         result = repository.dropped_rate(event.recipient_domain)
         if result.dropped_rate > REPORTING_THRESHOLD
