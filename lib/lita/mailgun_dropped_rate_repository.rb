@@ -5,7 +5,7 @@ require 'json'
 module Lita
   class MailgunDroppedRateRepository
     VALID_EVENTS = [:delivered, :dropped]
-    MAX_EVENTS = 20
+    MAX_EVENTS = 50
     ONE_WEEK = 60 * 60 * 24 * 7
     TWO_WEEKS = ONE_WEEK * 2
 

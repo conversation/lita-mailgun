@@ -33,7 +33,7 @@ describe Lita::MailgunDroppedRateRepository do
 
       it "trims the list" do
         repository.record("user@example.com", :delivered)
-        expect(redis).to have_received(:ltrim).with("events-example.com", -20, -1)
+        expect(redis).to have_received(:ltrim).with("events-example.com", -50, -1)
       end
 
       it "sets the list expiry" do
@@ -83,7 +83,7 @@ describe Lita::MailgunDroppedRateRepository do
     let(:result) { repository.dropped_rate("example.com") }
 
     before do
-      allow(redis).to receive(:lrange).with("events-example.com", 0, 19).and_return(stored_events)
+      allow(redis).to receive(:lrange).with("events-example.com", 0, 49).and_return(stored_events)
     end
 
     context "when the requested domain has 4 events" do
