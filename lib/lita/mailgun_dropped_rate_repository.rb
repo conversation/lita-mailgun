@@ -5,6 +5,7 @@ require 'json'
 module Lita
   class MailgunDroppedRateRepository
     VALID_EVENTS = [:delivered, :dropped]
+    MAX_EVENTS = 20
     ONE_WEEK = 60 * 60 * 24 * 7
     TWO_WEEKS = ONE_WEEK * 2
 
@@ -32,7 +33,7 @@ module Lita
       key = "events-#{domain}"
       data = {event: event_name, domain: domain, recipient: recipient, at: Time.now.to_i}
       @redis.rpush(key, JSON.dump(data))
-      @redis.ltrim(key, -20, -1)
+      @redis.ltrim(key, MAX_EVENTS * -1, -1)
       @redis.expire(key, TWO_WEEKS)
       true
     end
@@ -67,7 +68,7 @@ module Lita
       key = "events-#{domain}"
       one_week_ago = Time.now.to_i - ONE_WEEK
 
-      events = @redis.lrange(key, 0, 19) || []
+      events = @redis.lrange(key, 0, MAX_EVENTS - 1) || []
       events.map { |data|
         JSON.load(data)
       }.select { |data|
