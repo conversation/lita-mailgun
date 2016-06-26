@@ -10,14 +10,16 @@ module Lita
     TWO_WEEKS = ONE_WEEK * 2
 
     class DroppedResult
-      attr_reader :domain, :dropped, :uniq_dropped, :total
+      attr_reader :domain, :uniq_dropped, :uniq_addresses, :total
 
-      def initialize(domain, dropped, uniq_dropped, total)
-        @domain, @dropped, @uniq_dropped, @total = domain, dropped.to_i, uniq_dropped.to_i, total.to_i
+      def initialize(domain, uniq_dropped, uniq_addresses, total)
+        @domain, @uniq_dropped, @uniq_addresses, @total = domain, uniq_dropped.to_i, uniq_addresses.to_i, total.to_i
       end
 
       def dropped_rate
-        (BigDecimal.new(dropped) / BigDecimal.new(total) * 100).round(3)
+        return 0 if uniq_addresses <= 0
+
+        (BigDecimal.new(uniq_dropped) / BigDecimal.new(uniq_addresses) * 100).round(3)
       end
     end
 
@@ -41,7 +43,12 @@ module Lita
     def dropped_rate(domain)
       events = fetch_events(domain)
 
-      DroppedResult.new( domain, dropped_count(events), uniq_dropped_count(events), events.size )
+      DroppedResult.new(
+        domain,
+        uniq_dropped_count(events),
+        uniq_address_count(events),
+        events.size
+      )
     end
 
     private
@@ -50,16 +57,16 @@ module Lita
       email.to_s.split("@").last || "unknown"
     end
 
-    def dropped_count(events)
-      events.select { |item|
-        item["event".freeze] == "dropped".freeze
-      }.size
-    end
-
     def uniq_dropped_count(events)
       events.select { |item|
         item["event".freeze] == "dropped".freeze
       }.map { |item|
+        item["recipient".freeze]
+      }.uniq.size
+    end
+
+    def uniq_address_count(events)
+      events.map { |item|
         item["recipient".freeze]
       }.uniq.size
     end

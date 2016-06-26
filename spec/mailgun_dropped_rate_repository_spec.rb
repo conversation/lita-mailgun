@@ -90,7 +90,7 @@ describe Lita::MailgunDroppedRateRepository do
       let(:stored_events) {
         [
           JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
-          JSON.dump(event: "dropped", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
+          JSON.dump(event: "dropped", domain: "example.com", recipient: "user2@example.com", at: Time.now.to_i),
           JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
           JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
         ]
@@ -100,20 +100,21 @@ describe Lita::MailgunDroppedRateRepository do
         expect(result.domain).to eq("example.com")
       end
 
-      it "sets the dropped count" do
-        expect(result.dropped).to eq(1)
-      end
-
       it "sets the uniq dropped_count" do
         expect(result.uniq_dropped).to eq(1)
       end
+
+      it "sets the uniq addresses count" do
+        expect(result.uniq_addresses).to eq(2)
+      end
+
 
       it "sets the total_count" do
         expect(result.total).to eq(4)
       end
 
       it "includes the dropped rate" do
-        expect(result.dropped_rate).to eq(BigDecimal.new("25.0"))
+        expect(result.dropped_rate).to eq(BigDecimal.new("50.0"))
       end
     end
 
@@ -128,12 +129,12 @@ describe Lita::MailgunDroppedRateRepository do
         expect(result.domain).to eq("example.com")
       end
 
-      it "sets the dropped count" do
-        expect(result.dropped).to eq(0)
-      end
-
       it "sets the uniq dropped_count" do
         expect(result.uniq_dropped).to eq(0)
+      end
+
+      it "sets the uniq_addresses count" do
+        expect(result.uniq_addresses).to eq(1)
       end
 
       it "sets the total_count" do
@@ -151,7 +152,7 @@ describe Lita::MailgunDroppedRateRepository do
         [
           JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i - eight_days),
           JSON.dump(event: "dropped", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
-          JSON.dump(event: "delivered", domain: "example.com", recipient: "user@example.com", at: Time.now.to_i),
+          JSON.dump(event: "delivered", domain: "example.com", recipient: "user2@example.com", at: Time.now.to_i),
         ]
       }
 
@@ -159,12 +160,12 @@ describe Lita::MailgunDroppedRateRepository do
         expect(result.domain).to eq("example.com")
       end
 
-      it "sets the dropped count" do
-        expect(result.dropped).to eq(1)
-      end
-
       it "sets the uniq dropped_count" do
         expect(result.uniq_dropped).to eq(1)
+      end
+
+      it "sets the uniq_addresses count" do
+        expect(result.uniq_addresses).to eq(2)
       end
 
       it "sets the total_count" do
