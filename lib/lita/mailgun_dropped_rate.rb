@@ -8,7 +8,8 @@ module Lita
     # with a high dropped rate
     class MailgunDroppedRate < Handler
       ONE_HOUR = 60 * 60
-      REPORTING_THRESHOLD = 50 # percent
+      REPORTING_THRESHOLD_PERCENT = 50 # percent
+      REPORTING_THRESHOLD_ADDRESSES = 2 # uniq addresses
 
       config :channel_name
 
@@ -20,7 +21,7 @@ module Lita
         repository.record(event.recipient, event.name.to_sym)
 
         result = repository.dropped_rate(event.recipient_domain)
-        if result.dropped_rate > REPORTING_THRESHOLD
+        if result.dropped_rate >= REPORTING_THRESHOLD_PERCENT && result.uniq_dropped >= REPORTING_THRESHOLD_ADDRESSES
           persistent_every(event.recipient_domain, ONE_HOUR) do
             robot.send_message(target, result_to_message(result))
           end
