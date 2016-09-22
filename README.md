@@ -15,6 +15,13 @@ get started, use the mailgun web interface to configure a webhook that POSTs eve
 
     http://your-lita-bot.com/mailgun
 
+It can also accept incoming emails that mailgun POSTS to a URL. Configure this
+by adding a route in the mailgun web interface that POSTS to:
+
+    http://your-lita-bot.com/mailgun_incoming
+
+Incoming messages will be emited on the lita event bus with the name :mailgun\_incoming.
+
 ### Dropped Email Reports
 
 To print a warning when a high number of recent emails to a domain were
